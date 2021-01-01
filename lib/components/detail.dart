@@ -27,12 +27,12 @@ class Detail extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 for (var entry in {
-                  'Description: ': task.description,
-                  'Due:         ': task.due,
-                  'End:         ': task.end,
-                  'Entry:       ': task.entry,
-                  'Modified:    ': task.modified,
-                  'Priority:    ': task.priority,
+                  'description: ': task.description,
+                  'due:         ': task.due,
+                  'end:         ': task.end,
+                  'entry:       ': task.entry,
+                  'modified:    ': task.modified,
+                  'priority:    ': task.priority,
                 }.entries)
                   DetailCard(
                     uuid: task.uuid,
