@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'package:taskc/taskc.dart';
 
@@ -25,12 +26,12 @@ class Detail extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             for (var entry in {
-              'Description': task.description,
-              'Due': task.due,
-              'End': task.end,
-              'Entry': task.entry,
-              'Modified': task.modified,
-              'Priority': task.priority,
+              'Description: ': task.description,
+              'Due:         ': task.due,
+              'End:         ': task.end,
+              'Entry:       ': task.entry,
+              'Modified:    ': task.modified,
+              'Priority:    ': task.priority,
             }.entries)
               DetailCard(
                 uuid: task.uuid,
@@ -64,17 +65,13 @@ class DetailCard extends StatelessWidget {
         elevation: 0.1,
         child: Padding(
           padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+          child: Row(
             children: [
               Text(
                 desc,
-                style: TextStyle(fontWeight: FontWeight.bold),
+                style: GoogleFonts.firaMono(),
               ),
-              SizedBox(
-                height: 10,
-              ),
-              if (desc == 'Priority')
+              if (desc.startsWith('Priority'))
                 DropdownButton(
                     value: (value == 'Nil') ? '' : value,
                     items: [
@@ -92,7 +89,10 @@ class DetailCard extends StatelessWidget {
                       await addTask(newTask);
                     })
               else
-                Container(padding: EdgeInsets.all(20), child: Text(value))
+                Container(
+                  padding: EdgeInsets.all(20),
+                  child: Text(value, style: GoogleFonts.firaMono()),
+                )
             ],
           ),
         ),
