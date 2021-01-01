@@ -7,9 +7,9 @@ import 'package:flutter_task_app/shared/hive_data.dart';
 import 'package:flutter_task_app/shared/misc.dart';
 
 class Detail extends StatelessWidget {
-  const Detail(this.task);
+  const Detail(this.uuid);
 
-  final Task task;
+  final String uuid;
 
   @override
   Widget build(BuildContext context) {
@@ -17,34 +17,37 @@ class Detail extends StatelessWidget {
       appBar: AppBar(
         title: Text('Task'),
       ),
-      floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.save),
-        onPressed: () {},
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            for (var entry in {
-              'Description: ': task.description,
-              'Due:         ': task.due,
-              'End:         ': task.end,
-              'Entry:       ': task.entry,
-              'Modified:    ': task.modified,
-              'Priority:    ': task.priority,
-            }.entries)
-              DetailCard(
-                uuid: task.uuid,
-                name: entry.key,
-                value: entry.value != null
-                    ? ((entry.value is DateTime)
-                        // ignore: avoid_as
-                        ? '${(entry.value as DateTime).toLocal()}'
-                        : '${entry.value}')
-                    : 'null',
-              ),
-          ],
-        ),
+      body: ValueListenableBuilder(
+        valueListenable: getDataBoxListenable(),
+        builder: (context, box, _) {
+          var task = Task.fromJson(box.get(uuid));
+
+          return SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                for (var entry in {
+                  'Description: ': task.description,
+                  'Due:         ': task.due,
+                  'End:         ': task.end,
+                  'Entry:       ': task.entry,
+                  'Modified:    ': task.modified,
+                  'Priority:    ': task.priority,
+                }.entries)
+                  DetailCard(
+                    uuid: task.uuid,
+                    name: entry.key,
+                    value: entry.value != null
+                        ? ((entry.value is DateTime)
+                            // ignore: avoid_as
+                            ? '${(entry.value as DateTime).toLocal()}'
+                            : '${entry.value}')
+                        : 'null',
+                  ),
+              ],
+            ),
+          );
+        },
       ),
     );
   }
@@ -89,12 +92,10 @@ class DetailCard extends StatelessWidget {
                       await addTask(newTask);
                     })
               else
-                Container(
-                  child: Text(
-                    value,
-                    style: GoogleFonts.firaMono(),
-                  ),
-                )
+                Text(
+                  value,
+                  style: GoogleFonts.firaMono(),
+                ),
             ],
           ),
         ),
