@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'package:taskc/taskc.dart';
@@ -6,53 +5,10 @@ import 'package:taskc/taskc.dart';
 import 'package:flutter_task_app/shared/hive_data.dart';
 import 'package:flutter_task_app/shared/misc.dart';
 
-class Detail extends StatefulWidget {
+class Detail extends StatelessWidget {
   const Detail(this.task);
 
   final Task task;
-
-  @override
-  _DetailState createState() => _DetailState();
-}
-
-class _DetailState extends State<Detail> {
-  Map<String, dynamic> map;
-
-  @override
-  void initState() {
-    super.initState();
-    map = {
-      'description': widget.task.description,
-      'due': widget.task.due,
-      'end': widget.task.end,
-      'entry': widget.task.entry,
-      'modified': widget.task.modified,
-      'priority': widget.task.priority
-    };
-  }
-
-  Function updateState(String name) {
-    return (dynamic value) {
-      setState(() {
-        map[name] = value;
-      });
-    };
-  }
-
-  Future<void> saveTask() async {
-    print(map);
-    var t = Task(
-        description: map['description'],
-        entry: DateTime.now().toUtc(),
-        status: widget.task.status,
-        uuid: widget.task.uuid,
-        due: map['due'],
-        end: map['end'],
-        modified: DateTime.now().toUtc(),
-        priority: map['priority']);
-
-    await addTask(t);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -62,16 +18,22 @@ class _DetailState extends State<Detail> {
       ),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.save),
-        onPressed: saveTask,
+        onPressed: () {},
       ),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            for (var entry in map.entries)
+            for (var entry in {
+              'Description': task.description,
+              'Due': task.due,
+              'End': task.end,
+              'Entry': task.entry,
+              'Modified': task.modified,
+              'Priority': task.priority,
+            }.entries)
               DetailCard(
-                uuid: widget.task.uuid,
-                updateFunc: updateState(entry.key),
+                uuid: task.uuid,
                 desc: entry.key,
                 value: entry.value != null
                     ? ((entry.value is DateTime)
@@ -87,29 +49,12 @@ class _DetailState extends State<Detail> {
   }
 }
 
-class DetailCard extends StatefulWidget {
-  const DetailCard({this.uuid, this.desc, this.value, this.updateFunc});
+class DetailCard extends StatelessWidget {
+  const DetailCard({this.uuid, this.desc, this.value});
 
   final String uuid;
   final String desc;
   final String value;
-  final Function updateFunc;
-
-  @override
-  _DetailCardState createState() => _DetailCardState();
-}
-
-class _DetailCardState extends State<DetailCard> {
-  void initState() {
-    super.initState();
-    _descController = TextEditingController(text: widget.value);
-  }
-
-  String toTitleCase(String string) {
-    return '${string[0].toUpperCase()}${string.substring(1)}';
-  }
-
-  TextEditingController _descController;
 
   @override
   Widget build(BuildContext context) {
@@ -123,15 +68,15 @@ class _DetailCardState extends State<DetailCard> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
-                toTitleCase(widget.desc),
+                desc,
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               SizedBox(
                 height: 10,
               ),
-              if (widget.desc == 'priority')
+              if (desc == 'Priority')
                 DropdownButton(
-                    value: (widget.value == 'Nil') ? '' : widget.value,
+                    value: (value == 'Nil') ? '' : value,
                     items: [
                       for (var priority in ['H', 'M', 'L', ''])
                         DropdownMenuItem(
@@ -140,18 +85,14 @@ class _DetailCardState extends State<DetailCard> {
                         ),
                     ],
                     onChanged: (priority) async {
-                      widget.updateFunc(priority);
+                      var task = await getTask(uuid);
+                      var newTask = task.copyWith(
+                        priority: () => (priority == '') ? null : priority,
+                      );
+                      await addTask(newTask);
                     })
-              else if (widget.desc == 'description')
-                TextField(
-                  controller: _descController,
-                  onChanged: (value) {
-                    widget.updateFunc(value);
-                  },
-                )
               else
-                Container(
-                    padding: EdgeInsets.all(20), child: Text(widget.value))
+                Container(padding: EdgeInsets.all(20), child: Text(value))
             ],
           ),
         ),
