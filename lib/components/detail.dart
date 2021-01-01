@@ -41,7 +41,7 @@ class Detail extends StatelessWidget {
                         // ignore: avoid_as
                         ? '${(entry.value as DateTime).toLocal()}'
                         : '${entry.value}')
-                    : 'Nil',
+                    : 'null',
               ),
           ],
         ),
@@ -73,7 +73,7 @@ class DetailCard extends StatelessWidget {
               ),
               if (name.startsWith('Priority'))
                 DropdownButton(
-                    value: (value == 'Nil') ? '' : value,
+                    value: (value == 'null') ? '' : value,
                     items: [
                       for (var priority in ['H', 'M', 'L', ''])
                         DropdownMenuItem(
