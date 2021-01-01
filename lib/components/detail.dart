@@ -35,7 +35,7 @@ class Detail extends StatelessWidget {
             }.entries)
               DetailCard(
                 uuid: task.uuid,
-                desc: entry.key,
+                name: entry.key,
                 value: entry.value != null
                     ? ((entry.value is DateTime)
                         // ignore: avoid_as
@@ -51,10 +51,10 @@ class Detail extends StatelessWidget {
 }
 
 class DetailCard extends StatelessWidget {
-  const DetailCard({this.uuid, this.desc, this.value});
+  const DetailCard({this.uuid, this.name, this.value});
 
   final String uuid;
-  final String desc;
+  final String name;
   final String value;
 
   @override
@@ -68,10 +68,10 @@ class DetailCard extends StatelessWidget {
           child: Row(
             children: [
               Text(
-                desc,
+                name,
                 style: GoogleFonts.firaMono(),
               ),
-              if (desc.startsWith('Priority'))
+              if (name.startsWith('Priority'))
                 DropdownButton(
                     value: (value == 'Nil') ? '' : value,
                     items: [
@@ -90,8 +90,10 @@ class DetailCard extends StatelessWidget {
                     })
               else
                 Container(
-                  padding: EdgeInsets.all(20),
-                  child: Text(value, style: GoogleFonts.firaMono()),
+                  child: Text(
+                    value,
+                    style: GoogleFonts.firaMono(),
+                  ),
                 )
             ],
           ),
