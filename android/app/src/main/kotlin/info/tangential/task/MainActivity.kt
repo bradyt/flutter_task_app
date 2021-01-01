@@ -1,4 +1,4 @@
-package com.example.task
+package info.tangential.task
 
 import io.flutter.embedding.android.FlutterActivity
 
