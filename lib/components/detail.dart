@@ -15,7 +15,31 @@ class Detail extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Task'),
+        title: Text(uuid.split('-').first),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.delete),
+            onPressed: () async {
+              var task = await getTask(uuid);
+              var newTask = task.copyWith(
+                modified: () => DateTime.now().toUtc(),
+                status: () => 'deleted',
+              );
+              await addTask(newTask);
+            },
+          ),
+          IconButton(
+            icon: Icon(Icons.done),
+            onPressed: () async {
+              var task = await getTask(uuid);
+              var newTask = task.copyWith(
+                modified: () => DateTime.now().toUtc(),
+                status: () => 'completed',
+              );
+              await addTask(newTask);
+            },
+          ),
+        ],
       ),
       body: ValueListenableBuilder(
         valueListenable: getDataBoxListenable(),
@@ -28,11 +52,13 @@ class Detail extends StatelessWidget {
               children: [
                 for (var entry in {
                   'description: ': task.description,
-                  'due:         ': task.due,
-                  'end:         ': task.end,
+                  'status:      ': task.status,
                   'entry:       ': task.entry,
                   'modified:    ': task.modified,
+                  'end:         ': task.end,
+                  'due:         ': task.due,
                   'priority:    ': task.priority,
+                  'tags:        ': task.tags,
                 }.entries)
                   DetailCard(
                     uuid: task.uuid,
@@ -66,37 +92,105 @@ class DetailCard extends StatelessWidget {
       padding: const EdgeInsets.all(2),
       child: Card(
         elevation: 0.1,
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Row(
-            children: [
-              Text(
-                name,
-                style: GoogleFonts.firaMono(),
-              ),
-              if (name.startsWith('Priority'))
-                DropdownButton(
-                    value: (value == 'null') ? '' : value,
-                    items: [
-                      for (var priority in ['H', 'M', 'L', ''])
-                        DropdownMenuItem(
-                          child: Text(priority),
-                          value: priority,
+        child: InkWell(
+          onLongPress: (name.startsWith('due'))
+              ? () async {
+                  await showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      scrollable: true,
+                      content: Text('Clear due date?'),
+                      actions: [
+                        TextButton(
+                          child: Text('Cancel'),
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
                         ),
-                    ],
-                    onChanged: (priority) async {
+                        ElevatedButton(
+                          child: Text('Clear'),
+                          onPressed: () async {
+                            var task = await getTask(uuid);
+                            var newTask = task.copyWith(
+                              modified: () => DateTime.now().toUtc(),
+                              due: () => null,
+                            );
+                            await addTask(newTask);
+                            Navigator.of(context).pop();
+                          },
+                        ),
+                      ],
+                    ),
+                  );
+                }
+              : null,
+          onTap: (name.startsWith('due'))
+              ? () async {
+                  var now =
+                      DateTime.tryParse(value)?.toLocal() ?? DateTime.now();
+
+                  var date = await showDatePicker(
+                    context: context,
+                    initialDate: now,
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime(2037),
+                  );
+                  if (date != null) {
+                    var time = await showTimePicker(
+                      context: context,
+                      initialTime: TimeOfDay.fromDateTime(now),
+                    );
+                    if (time != null) {
+                      var due = date.add(
+                        Duration(
+                          hours: time.hour,
+                          minutes: time.minute,
+                        ),
+                      );
                       var task = await getTask(uuid);
                       var newTask = task.copyWith(
-                        priority: () => (priority == '') ? null : priority,
+                        modified: () => DateTime.now().toUtc(),
+                        due: () => due.toUtc(),
                       );
                       await addTask(newTask);
-                    })
-              else
+                    }
+                  }
+                }
+              : null,
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Row(
+              children: [
                 Text(
-                  value,
+                  name,
                   style: GoogleFonts.firaMono(),
                 ),
-            ],
+                if (name.startsWith('priority'))
+                  DropdownButton(
+                      value: (value == 'null') ? '' : value,
+                      items: [
+                        for (var priority in ['H', 'M', 'L', ''])
+                          DropdownMenuItem(
+                            child: Text(priority),
+                            value: priority,
+                            onTap: null,
+                          ),
+                      ],
+                      onChanged: (priority) async {
+                        var task = await getTask(uuid);
+                        var newTask = task.copyWith(
+                          modified: () => DateTime.now().toUtc(),
+                          priority: () => (priority == '') ? null : priority,
+                        );
+                        await addTask(newTask);
+                      })
+                else
+                  Text(
+                    value,
+                    style: GoogleFonts.firaMono(),
+                  ),
+              ],
+            ),
           ),
         ),
       ),
