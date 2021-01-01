@@ -185,9 +185,6 @@ class TodoCard extends StatelessWidget {
   static final titleStyle =
       TextStyle(fontSize: 18, fontWeight: FontWeight.bold);
 
-  static final _borderStyle =
-      BorderSide(color: Colors.grey[200], width: 2, style: BorderStyle.solid);
-
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -205,19 +202,6 @@ class TodoCard extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      Container(
-                        width: 20,
-                        height: 20,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.all(Radius.circular(50)),
-                          border: Border(
-                              top: _borderStyle,
-                              right: _borderStyle,
-                              bottom: _borderStyle,
-                              left: _borderStyle),
-                        ),
-                      ),
-                      SizedBox(width: 20),
                       Flexible(
                         child: SingleChildScrollView(
                           scrollDirection: Axis.horizontal,
