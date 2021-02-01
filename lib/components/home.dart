@@ -13,7 +13,7 @@ import 'package:flutter_task_app/shared/misc.dart';
 
 class Home extends StatelessWidget {
   final String title =
-      'task${kDebugMode ? ' \u{1f41e}' : (kProfileMode ? ' \u{1f680}' : '')}';
+      'task0${kDebugMode ? ' \u{1f41e}' : (kProfileMode ? ' \u{1f680}' : '')}';
 
   @override
   Widget build(BuildContext context) {

@@ -11,7 +11,7 @@ void main() {
 
 class MyApp extends StatelessWidget {
   final String title =
-      'task${kDebugMode ? ' 🐞' : (kProfileMode ? ' 🚀' : '')}';
+      'task0${kDebugMode ? ' 🐞' : (kProfileMode ? ' 🚀' : '')}';
 
   @override
   Widget build(BuildContext context) {
